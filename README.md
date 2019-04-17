@@ -1,2 +1,2 @@
 # Coding-Problems
-### Languajes to be found here (Python, C++)
+### Languajes to be found here (Python)
