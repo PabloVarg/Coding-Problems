@@ -10,26 +10,26 @@ class Node:
         self.right = right
 
 # Algorithm
-serie = []
-def serialize(root):
-    global serie
+def serialize(root, serie):
     if root == None:
         serie.append(root)
         return
     serie.append(root.val)
-    serialize(root.left)
-    serialize(root.right)
+    serialize(root.left, serie)
+    serialize(root.right, serie)
     return serie
 
 def deserialize(serie):
-    if len(serie) == 0 or serie[0] == 'None':
-       return
-    node = Node(serie[0])
-    serie.pop(0)
-    node.left = deserialize(serie)
-    node.right = deserialize(serie)
-    return node
+        def _helper(index):
+            if serie[index] == None:
+                return None, index + 1
+
+            value = serie[index]
+            left, index = _helper(index + 1)
+            right, index = _helper(index)
+            return Node(value, left, right), index
+        return _helper(0)[0]
 
 # Test given by the problem
 node = Node('root', Node('left', Node('left.left')), Node('right'))
-assert deserialize(serialize(node)).left.left.val == 'left.left'
+assert deserialize(serialize(node, list())).left.left.val == 'left.left'
