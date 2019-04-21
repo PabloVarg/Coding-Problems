@@ -11,19 +11,27 @@
 #include <inttypes.h>
 using namespace std;
 
+//Algorithm
+class Node;
+
+Node *applyXor(Node *a, Node *b){
+    return (Node*) ((uintptr_t) (a) ^ (uintptr_t)(b));
+}
+
 class Node{
     public:
         int element;
         Node *both;
 
-        Node(int element){
+        Node(int element, Node* previous, Node * next){
             this->element = element;
+            this->both = applyXor(previous, next);
+        }
+
+        Node *getNext(Node *previous){
+            return applyXor(previous, both);
         }
 };
-
-Node *applyXor(Node *a, Node *b){
-    return (Node*) ((uintptr_t) (a) ^ (uintptr_t)(b));
-}
 
 class XorLinkedList{
     private:
@@ -31,82 +39,56 @@ class XorLinkedList{
 
     public:
         void add(int element){
-            cout<<endl<<endl;
-            Node *previous = NULL;
-            Node **current = &head;
-            Node *next;
+            if(head == NULL){
+                head = new Node(element, NULL, NULL);
+            }else{
+                Node *previous = NULL;
+                Node *current = head;
+                Node *next = applyXor(previous, (current)->both);
 
-            while(*current != NULL){
-                cout<<"Provious"<<previous<<endl;
-                cout<<"Next"<<next<<endl;
-                cout<<"Current: "<<*current<<endl;
-                cout<<"Both: "<<(*current)->both<<endl<<endl;
-                next = applyXor(previous, (*current)->both);
-                previous = *current;
-                current = &next;
-                cout<<"Provious"<<previous<<endl;
-                cout<<"Next"<<next<<endl;
-                cout<<"Current: "<<*current<<endl<<endl;
-            }
+                while(next != NULL){
+                    previous = current;
+                    current = next;
+                    next = applyXor(previous, current->both);
+                }
 
-            *current = new Node(element);
-            (*current)->both = applyXor(previous, NULL);
-            cout<<"Created: "<<*current<<endl;
-
-            if(previous != NULL){
-                cout<<previous->both<<endl;
-                previous->both = applyXor(previous->both, *current);
-                cout<<previous->both<<endl;
+                Node *newNode = new Node(element, current, NULL);
+                current->both = applyXor(previous, newNode);
             }
         }
 
-        Node *get(int index){
+        Node *get(unsigned int index){
+            /** Only works with unsigned int | index >= 0 **/
             Node *previous = NULL;
             Node *current = head;
-            Node *next;
+            Node *next = applyXor(previous, current->both);
 
             for(int i = 0; i < index; i++){
-                next = applyXor(previous, current->both);
+                if(next == NULL) throw "Index out of bounds";
+
                 previous = current;
                 current = next;
+                next = applyXor(previous, current->both);
             }
 
             return current;
         }
-    void printList ()
-    {
-        Node *curr = head;
-        Node *prev = NULL;
-        Node *next;
-
-        cout << "Following are the nodes of Linked List: \n";
-
-        while (curr != NULL)
-        {
-            // print current node
-            cout<<curr->element<<" ";
-
-            // get address of next node: curr->npx is
-            // next^prev, so curr->npx^prev will be
-            // next^prev^prev which is next
-            next = applyXor (prev, curr->both);
-
-            // update prev and curr for next iteration
-            prev = curr;
-            curr = next;
-        }
-    }
 };
 
-int main ()
-{
+//Tests
+int main (){
     XorLinkedList list;
     list.add(2);
     list.add(3);
     list.add(4);
     list.add(34);
-    printf("elem %i\n", (new Node(3))->element);
-    printf("Element: %p, %i\n", list.get(1), list.get(1)->element);
-    list.printList();
-    return (0);
+    printf("Element: %i\n", list.get(0)->element);
+    printf("Element: %i\n", list.get(3)->element);
+
+    try{
+    printf("Element: %i\n", list.get(-1)->element);
+    }catch(const char *msg){
+        cout << msg << endl;
+    }
+    return 0;
 }
