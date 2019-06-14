@@ -11,10 +11,14 @@ For example, pow(2, 10) should return 1024. """
 
 from math import log2
 
-def pow(x, y):
-    if y == 0: return 1
+class Power():
+    mem = {0: 1}
 
-    temp = pow(x, y // 2)
-    return temp * temp * (1 if y % 2 == 0 else x)
+    def pow(x, y):
+        if y in Power.mem: return Power.mem[y]
 
-print(pow(2, 10))
+        Power.mem[y] = pow(x, y // 2)
+
+        return Power.mem[y] * Power.mem[y] * (1 if y % 2 == 0 else x)
+
+print(Power.pow(3, 10))
