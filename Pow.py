@@ -10,9 +10,10 @@ repeated multiplication.
 For example, pow(2, 10) should return 1024. """
 
 from math import log2
+import sys
 
 class Power():
-    mem = {0: 1}
+    mem = {0: 1} # Using memoization makes it log(n)
 
     def pow(x, y):
         if y in Power.mem: return Power.mem[y]
@@ -21,4 +22,9 @@ class Power():
 
         return Power.mem[y] * Power.mem[y] * (1 if y % 2 == 0 else x)
 
-print(Power.pow(3, 10))
+
+if __name__ == '__main__':
+    base = int(sys.argv[1])
+    exp  = int(sys.argv[2])
+
+    print(Power.pow(base, exp))
