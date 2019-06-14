@@ -14,6 +14,7 @@ from math import log2
 def pow(x, y):
     if y == 0: return 1
 
-    return pow(x, y // 2) * pow(x, y // 2) * (1 if y % 2 == 0 else x)
+    temp = pow(x, y // 2)
+    return temp * temp * (1 if y % 2 == 0 else x)
 
 print(pow(2, 10))
